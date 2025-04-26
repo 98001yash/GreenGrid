@@ -1,6 +1,7 @@
 package com.company.GreenGrid.service;
 
 
+import com.company.GreenGrid.dtos.UserDto;
 import com.company.GreenGrid.entities.User;
 import com.company.GreenGrid.repository.UserRepository;
 import com.company.GreenGrid.security.JWTService;
@@ -33,4 +34,6 @@ public class AuthService {
         return new String[]{accessToken, refreshToken};
 
     }
+
+    public UserDto
 }
