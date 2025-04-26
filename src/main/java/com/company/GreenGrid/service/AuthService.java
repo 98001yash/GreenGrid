@@ -1,10 +1,14 @@
 package com.company.GreenGrid.service;
 
 
+import com.company.GreenGrid.dtos.SignUpDto;
 import com.company.GreenGrid.dtos.UserDto;
 import com.company.GreenGrid.entities.User;
+import com.company.GreenGrid.enums.Roles;
+import com.company.GreenGrid.exceptions.RuntimeConflictException;
 import com.company.GreenGrid.repository.UserRepository;
 import com.company.GreenGrid.security.JWTService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +41,17 @@ public class AuthService {
 
     }
 
-    public UserDto
+    @Transactional
+    public UserDto signup(SignUpDto signUpDto){
+        User user = userRepository.findByEmail(signUpDto.getEmail()).orElse(null);
+
+        if(user!=null){
+            throw new RuntimeConflictException("cannot signup, User already exists with email"+signUpDto.getEmail());
+        }
+
+        User mappedUser = modelMapper.map(signUpDto, User.class);
+        mappedUser.setRoles(Set.of(Roles.INDIVIDUAL));
+        mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
+        User savedUser = userRepository.save(mappedUser);
+    }
 }
