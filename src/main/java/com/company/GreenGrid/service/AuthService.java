@@ -5,6 +5,7 @@ import com.company.GreenGrid.dtos.SignUpDto;
 import com.company.GreenGrid.dtos.UserDto;
 import com.company.GreenGrid.entities.User;
 import com.company.GreenGrid.enums.Roles;
+import com.company.GreenGrid.exceptions.ResourceNotFoundException;
 import com.company.GreenGrid.exceptions.RuntimeConflictException;
 import com.company.GreenGrid.repository.UserRepository;
 import com.company.GreenGrid.security.JWTService;
@@ -53,5 +54,16 @@ public class AuthService {
         mappedUser.setRoles(Set.of(Roles.INDIVIDUAL));
         mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
         User savedUser = userRepository.save(mappedUser);
+
+        return modelMapper.map(savedUser, UserDto.class);
+    }
+
+
+
+    public String refreshToken(String refreshToken){
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+
+        User user = userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("User not found with id:  "+userId));
+        return jwtService.generateAccessToken(user);
     }
 }
