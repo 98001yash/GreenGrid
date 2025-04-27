@@ -12,6 +12,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,5 +35,14 @@ public class IssueService {
 
         log.info("Issue saved successfully with ID: {}",savedIssue.getId());
         return modelMapper.map(savedIssue, IssueResponseDto.class);
+    }
+
+    public List<IssueResponseDto> getAllIssues() {
+        log.info("Fetching all issues...");
+
+        List<Issue> issues = issueRepository.findAll();
+        return issues.stream()
+                .map(issue -> modelMapper.map(issue, IssueResponseDto.class))
+                .collect(Collectors.toList());
     }
 }
