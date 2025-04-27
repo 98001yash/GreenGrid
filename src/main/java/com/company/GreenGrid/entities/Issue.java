@@ -23,6 +23,7 @@ public class Issue {
     private Long id;
     private String title;
     private String description;
+    private String category;
     private Double latitude;
     private Double longitude;
     private String imageUrl;
