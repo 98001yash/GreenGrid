@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/issues")
 @RequiredArgsConstructor
@@ -21,5 +23,11 @@ public class IssueController {
                                         @RequestParam Long userId){
         log.info("Api called: Report issue by userId: {}",userId);
         return issueService.reportIssue(issueRequestDto, userId);
+    }
+
+    @GetMapping
+    public List<IssueResponseDto> getAllIssues(){
+        log.info("Api called: Get all Issues");
+        return issueService.getAllIssues();
     }
 }
