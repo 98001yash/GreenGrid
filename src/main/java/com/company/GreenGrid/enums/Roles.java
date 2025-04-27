@@ -2,7 +2,7 @@ package com.company.GreenGrid.enums;
 
 public enum Roles {
 
-    INDIVIDUAL,
+    INDIVIDUALS,
     ADMIN,
     GOVERNMENT
 }

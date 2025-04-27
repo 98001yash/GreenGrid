@@ -51,7 +51,7 @@ public class AuthService {
         }
 
         User mappedUser = modelMapper.map(signUpDto, User.class);
-        mappedUser.setRoles(Set.of(Roles.INDIVIDUAL));
+        mappedUser.setRoles(Set.of(Roles.INDIVIDUALS));
         mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
         User savedUser = userRepository.save(mappedUser);
 
