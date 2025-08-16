@@ -29,18 +29,22 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserDto> signUp(@RequestBody SignUpDto signUpDto){
+        System.out.println("Signup API called for email: " + signUpDto.getEmail());
         return new ResponseEntity<>(authService.signup(signUpDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto,
-                                                  HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
-        String tokens[] =  authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+                                                  HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        String tokens[] = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
 
-        Cookie cookie = new Cookie("token", tokens[1]);
-        cookie.setHttpOnly(true);
+        // Save Refresh Token in cookie named "refreshToken" (NOT "token")
+        Cookie refreshCookie = new Cookie("refreshToken", tokens[1]);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(7 * 24 * 60 * 60);
+        httpServletResponse.addCookie(refreshCookie);
 
-        httpServletResponse.addCookie(cookie);
         return ResponseEntity.ok(new LoginResponseDto(tokens[0]));
     }
 
@@ -48,8 +52,8 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDto> refresh(HttpServletRequest request) {
-        String refreshToken = Arrays.stream(request.getCookies()).
-                filter(cookie -> "refreshToken".equals(cookie.getName()))
+        String refreshToken = Arrays.stream(request.getCookies())
+                .filter(cookie -> "refreshToken".equals(cookie.getName()))
                 .findFirst()
                 .map(Cookie::getValue)
                 .orElseThrow(() -> new AuthenticationServiceException("Refresh token not found inside the Cookies"));
